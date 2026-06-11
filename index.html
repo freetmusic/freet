@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>freet — ruang sunyi yang diterjemahkan menjadi suara</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wood:{50:'#f7f3ef',100:'#ebe3db',200:'#dcd1c3',300:'#c5b4a0',400:'#ad9278',500:'#967859',600:'#7d6148',700:'#6a5340',800:'#5a4638',900:'#4d3c31',1000:'#45362d'},
+                        senja:{50:'#fef7f0',100:'#fdecd8',200:'#fad5af',300:'#f6b87c',400:'#f19348',500:'#ee7a24',600:'#df6118',700:'#b94a16',800:'#933b19',900:'#773217',950:'#41180a'}
+                    },
+                    fontFamily:{display:['Playfair Display','serif'],body:['Inter','sans-serif'],elegant:['Cormorant Garamond','serif']}
+                }
+            }
+        }
+    </script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:'Inter',sans-serif;background:#0c0a09;color:#fafaf9;overflow-x:hidden}::selection{background:rgba(241,147,72,.3);color:#fef7f0}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0c0a09}::-webkit-scrollbar-thumb{background:#4d3c31;border-radius:3px}
+        .guitar-strings{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}.guitar-string{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,149,107,.15) 50%,transparent);pointer-events:auto;cursor:pointer;transition:all .3s}.guitar-string:hover{height:2px;background:linear-gradient(90deg,transparent,rgba(241,147,72,.5) 50%,transparent);animation:strVib .6s ease-out}.guitar-string.vibrating{animation:strVib 1.2s ease-out}@keyframes strVib{0%{transform:translateY(0)}10%{transform:translateY(-4px)}20%{transform:translateY(3px)}30%{transform:translateY(-3px)}50%{transform:translateY(-2px)}70%{transform:translateY(-1px)}100%{transform:translateY(0)}}
+        .particle{position:absolute;border-radius:50%;pointer-events:none;animation:floatUp linear infinite}@keyframes floatUp{0%{transform:translateY(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) translateX(30px);opacity:0}}
+        .wave-bar{display:inline-block;width:3px;border-radius:2px;background:linear-gradient(to top,#ad9278,#f19348);animation:waveAnim ease-in-out infinite alternate}@keyframes waveAnim{0%{height:4px}100%{height:var(--h)}}
+        .fade-section{opacity:0;transform:translateY(40px);transition:opacity .8s,transform .8s}.fade-section.visible{opacity:1;transform:translateY(0)}.fade-left{opacity:0;transform:translateX(-40px);transition:opacity .8s,transform .8s}.fade-left.visible{opacity:1;transform:translateX(0)}.fade-right{opacity:0;transform:translateX(40px);transition:opacity .8s,transform .8s}.fade-right.visible{opacity:1;transform:translateX(0)}
+        .hero-gradient{background:radial-gradient(ellipse 80% 50% at 50% 100%,rgba(146,64,14,.15),transparent 60%),radial-gradient(ellipse 60% 40% at 20% 80%,rgba(241,147,72,.08),transparent 50%),linear-gradient(180deg,#0c0a09,#1a1510 60%,#2a1f15)}
+        .warm-glow{box-shadow:0 0 60px rgba(241,147,72,.1),0 0 120px rgba(201,149,107,.05)}.text-warm-glow{text-shadow:0 0 40px rgba(241,147,72,.3)}
+        .fret-marker{width:8px;height:8px;border-radius:50%;background:rgba(241,147,72,.6);box-shadow:0 0 8px rgba(241,147,72,.4)}
+        .scroll-ind{animation:scrollB 2s ease-in-out infinite}@keyframes scrollB{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(8px);opacity:1}}
+        .mob-menu{transform:translateX(100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}.mob-menu.open{transform:translateX(0)}
+        .mood-tag{transition:all .3s}.mood-tag:hover{background:rgba(241,147,72,.15);border-color:rgba(241,147,72,.4);color:#f19348;transform:translateY(-2px)}
+        .pulse-ring{animation:pulseR 2s ease-out infinite}@keyframes pulseR{0%{transform:scale(1);opacity:.4}100%{transform:scale(1.5);opacity:0}}
+        .player-bar{backdrop-filter:blur(20px);background:rgba(28,25,23,.92);border-top:1px solid rgba(201,149,107,.1)}
+        .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-4px;left:50%;width:0;height:1px;background:#f19348;transition:all .3s;transform:translateX(-50%)}.nav-link:hover::after{width:100%}
+        .img-reveal{position:relative;overflow:hidden}.img-reveal::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(241,147,72,.1),transparent);pointer-events:none}
+        .lyric-line{opacity:.4;transition:all .5s}.lyric-line:hover{opacity:1;transform:translateX(8px)}
+        .toast{transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1)}.toast.show{transform:translateY(0);opacity:1}
+        .eq-bar{animation:eqBar .8s ease-in-out infinite alternate}@keyframes eqBar{0%{height:3px}100%{height:var(--eq,12px)}}
+        .yt-icon{display:inline-block;width:1em;height:1em;vertical-align:middle}
+        @media(max-width:768px){.hero-title{font-size:4rem!important}}
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="flex items-center justify-between h-20">
+            <a href="#hero" class="flex items-center gap-3 group">
+                <img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="freet" class="w-9 h-9 rounded-full object-cover ring-2 ring-senja-400/20 group-hover:ring-senja-400/50 transition-all">
+                <span class="font-display text-xl font-medium tracking-wide text-wood-100 group-hover:text-senja-400 transition-colors">freet</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#about" class="nav-link text-sm font-medium text-wood-300 hover:text-wood-50 transition-colors">Tentang</a>
+                <a href="#meaning" class="nav-link text-sm font-medium text-wood-300 hover:text-wood-50 transition-colors">Makna</a>
+                <a href="#music" class="nav-link text-sm font-medium text-wood-300 hover:text-wood-50 transition-colors">Musik</a>
+                <a href="#mood" class="nav-link text-sm font-medium text-wood-300 hover:text-wood-50 transition-colors">Suasana</a>
+                <a href="https://www.youtube.com/@freetindo" target="_blank" class="ml-4 flex items-center gap-2 px-5 py-2.5 bg-senja-400/10 border border-senja-400/20 rounded-full text-senja-400 text-sm font-medium hover:bg-senja-400/20 hover:border-senja-400/40 transition-all">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    YouTube
+                </a>
+            </div>
+            <button id="menuToggle" class="md:hidden w-10 h-10 flex items-center justify-center text-wood-300 hover:text-wood-50 transition-colors"><i data-lucide="menu" class="w-5 h-5" id="menuIcon"></i></button>
+        </div>
+    </div>
+</nav>
+<div id="mobileMenu" class="mob-menu fixed inset-0 z-40 bg-[#0c0a09]/98 backdrop-blur-xl flex flex-col items-center justify-center gap-8">
+    <a href="#about" class="mob-link text-2xl font-display text-wood-200 hover:text-senja-400 transition-colors">Tentang</a>
+    <a href="#meaning" class="mob-link text-2xl font-display text-wood-200 hover:text-senja-400 transition-colors">Makna</a>
+    <a href="#music" class="mob-link text-2xl font-display text-wood-200 hover:text-senja-400 transition-colors">Musik</a>
+    <a href="#mood" class="mob-link text-2xl font-display text-wood-200 hover:text-senja-400 transition-colors">Suasana</a>
+    <div class="mt-6 w-12 h-px bg-wood-700"></div>
+    <a href="https://www.youtube.com/@freetindo" target="_blank" class="flex items-center gap-3 text-senja-400 text-lg font-medium">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        @freetindo
+    </a>
+</div>
+
+<!-- HERO -->
+<section id="hero" class="relative min-h-screen hero-gradient flex items-center justify-center overflow-hidden">
+    <div class="guitar-strings"><div class="guitar-string" style="top:18%"></div><div class="guitar-string" style="top:30%"></div><div class="guitar-string" style="top:42%"></div><div class="guitar-string" style="top:54%"></div><div class="guitar-string" style="top:66%"></div><div class="guitar-string" style="top:78%"></div></div>
+    <div id="particles" class="absolute inset-0 pointer-events-none z-0"></div>
+    <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        <div class="flex items-center justify-center gap-3 mb-8"><div class="w-12 h-px bg-gradient-to-r from-transparent to-senja-400/40"></div><img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="" class="w-6 h-6 rounded-full"><div class="w-12 h-px bg-gradient-to-l from-transparent to-senja-400/40"></div></div>
+        <div class="flex justify-center mb-6"><img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="freet" class="w-20 h-20 md:w-24 md:h-24 rounded-full ring-2 ring-senja-400/20 shadow-lg shadow-senja-400/10"></div>
+        <h1 class="hero-title font-display text-7xl md:text-9xl lg:text-[10rem] font-bold tracking-tight text-wood-50 text-warm-glow mb-6">freet</h1>
+        <p class="font-elegant text-xl md:text-2xl lg:text-3xl text-wood-300 italic mb-4">ruang sunyi yang diterjemahkan menjadi suara</p>
+        <p class="font-body text-sm md:text-base text-wood-500 max-w-lg mx-auto leading-relaxed mt-6">Alternative folk pop dari Indonesia — petikan sederhana, malam yang panjang, dan cerita yang sulit diucapkan</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+            <a href="#music" class="group flex items-center gap-3 px-8 py-3.5 bg-senja-400 text-wood-1000 rounded-full font-medium text-sm hover:bg-senja-500 transition-all hover:shadow-lg hover:shadow-senja-400/20"><i data-lucide="headphones" class="w-4 h-4"></i> Dengarkan <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i></a>
+            <a href="https://www.youtube.com/@freetindo" target="_blank" class="flex items-center gap-3 px-8 py-3.5 border border-wood-700 text-wood-300 rounded-full font-medium text-sm hover:border-wood-500 hover:text-wood-100 transition-all"><i data-lucide="play" class="w-4 h-4"></i> Tonton di YouTube</a>
+        </div>
+    </div>
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 scroll-ind"><div class="flex flex-col items-center gap-2"><span class="text-wood-600 text-xs tracking-widest uppercase">Scroll</span><i data-lucide="chevron-down" class="w-4 h-4 text-wood-600"></i></div></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="relative py-24 md:py-32">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            <div class="fade-left">
+                <div class="flex items-center gap-3 mb-6"><div class="w-8 h-px bg-senja-400/40"></div><span class="text-senja-400 text-xs font-medium tracking-[.2em] uppercase">Tentang</span></div>
+                <h2 class="font-display text-3xl md:text-5xl font-semibold text-wood-50 leading-tight mb-8">Cerita yang lahir<br><span class="text-senja-400">dari kebisuan</span></h2>
+                <div class="space-y-5 text-wood-400 leading-relaxed">
+                    <p class="text-base md:text-lg"><span class="font-display italic text-wood-200 text-lg md:text-xl">freet</span> adalah ruang sunyi yang diterjemahkan menjadi suara. Sebuah proyek alternative folk pop yang tumbuh dari petikan sederhana, malam yang panjang, dan cerita-cerita yang sulit diucapkan langsung.</p>
+                    <p>Menggabungkan nuansa hangat akustik dengan atmosfer yang samar dan emosional, freet berjalan di antara rasa kehilangan, nostalgia, dan harapan kecil yang tetap bertahan diam-diam.</p>
+                </div>
+                <div class="grid grid-cols-3 gap-6 mt-10 pt-8 border-t border-wood-800/50">
+                    <div><div class="font-display text-2xl md:text-3xl text-senja-400 font-medium">folk</div><div class="text-wood-600 text-xs mt-1 tracking-wide uppercase">Genre</div></div>
+                    <div><div class="font-display text-2xl md:text-3xl text-senja-400 font-medium">indo</div><div class="text-wood-600 text-xs mt-1 tracking-wide uppercase">Asal</div></div>
+                    <div><div class="font-display text-2xl md:text-3xl text-senja-400 font-medium">∞</div><div class="text-wood-600 text-xs mt-1 tracking-wide uppercase">Cerita</div></div>
+                </div>
+            </div>
+            <div class="fade-right">
+                <div class="relative">
+                    <div class="img-reveal rounded-2xl overflow-hidden"><img src="https://picsum.photos/seed/acoustic-sunset-warm/700/900.jpg" alt="freet" class="w-full h-[500px] md:h-[600px] object-cover"></div>
+                    <div class="absolute -bottom-6 -left-6 md:-left-8 bg-wood-900/90 backdrop-blur-xl border border-wood-700/50 rounded-xl p-5 max-w-[240px] warm-glow">
+                        <div class="flex items-center gap-2 mb-3"><img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="" class="w-5 h-5 rounded-full"><div class="w-2 h-2 rounded-full bg-senja-400 animate-pulse"></div><span class="text-senja-400 text-xs font-medium tracking-wide">NOW PLAYING</span></div>
+                        <p class="font-display text-wood-100 text-sm italic">"Tanpamu"</p>
+                        <p class="text-wood-500 text-xs mt-1">freet</p>
+                        <div class="flex items-end gap-[3px] mt-3 h-4" id="miniWave"></div>
+                    </div>
+                    <div class="absolute -top-4 -right-4 w-full h-full border border-senja-400/10 rounded-2xl -z-10"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MEANING -->
+<section id="meaning" class="relative py-24 md:py-32 overflow-hidden">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-senja-400/[.03] rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto px-6 md:px-12"><div class="fade-section">
+        <div class="text-center mb-20">
+            <div class="flex items-center justify-center gap-3 mb-6"><div class="w-8 h-px bg-senja-400/40"></div><span class="text-senja-400 text-xs font-medium tracking-[.2em] uppercase">Makna Nama</span><div class="w-8 h-px bg-senja-400/40"></div></div>
+            <h2 class="font-display text-3xl md:text-5xl font-semibold text-wood-50">Dari <span class="italic text-senja-400">fret</span> menjadi <span class="italic text-senja-400">freet</span></h2>
+        </div>
+        <div class="max-w-3xl mx-auto mb-16">
+            <div class="relative bg-wood-900/50 border border-wood-800/50 rounded-2xl p-8 md:p-12 overflow-hidden">
+                <div class="relative h-48 md:h-56">
+                    <div class="absolute top-0 bottom-0 left-[15%] w-px bg-wood-600/30"></div><div class="absolute top-0 bottom-0 left-[30%] w-px bg-wood-600/30"></div><div class="absolute top-0 bottom-0 left-[45%] w-px bg-wood-600/40"></div><div class="absolute top-0 bottom-0 left-[60%] w-px bg-wood-600/30"></div><div class="absolute top-0 bottom-0 left-[75%] w-px bg-wood-600/20"></div>
+                    <div class="absolute left-0 right-0 top-[12%] h-px bg-gradient-to-r from-senja-400/10 via-senja-400/40 to-senja-400/10"></div><div class="absolute left-0 right-0 top-[28%] h-px bg-gradient-to-r from-senja-400/10 via-senja-400/35 to-senja-400/10"></div><div class="absolute left-0 right-0 top-[44%] h-px bg-gradient-to-r from-senja-400/10 via-senja-400/30 to-senja-400/10"></div><div class="absolute left-0 right-0 top-[60%] h-px bg-gradient-to-r from-senja-400/10 via-senja-400/25 to-senja-400/10"></div><div class="absolute left-0 right-0 top-[76%] h-px bg-gradient-to-r from-senja-400/10 via-senja-400/20 to-senja-400/10"></div>
+                    <div class="fret-marker absolute top-1/2 -translate-y-1/2 left-[37.5%]"></div><div class="fret-marker absolute top-1/2 -translate-y-1/2 left-[52.5%]"></div>
+                    <div class="absolute top-[28%] left-[45%] -translate-x-1/2 -translate-y-1/2"><div class="w-5 h-5 rounded-full bg-senja-400/30 border border-senja-400/50 flex items-center justify-center"><div class="w-2 h-2 rounded-full bg-senja-400"></div></div><div class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap"><span class="text-senja-400 text-xs font-medium">tekanan</span></div></div>
+                    <div class="absolute top-[60%] left-[30%] -translate-x-1/2 -translate-y-1/2"><div class="w-5 h-5 rounded-full bg-senja-400/30 border border-senja-400/50 flex items-center justify-center"><div class="w-2 h-2 rounded-full bg-senja-400"></div></div><div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap"><span class="text-senja-400 text-xs font-medium">luka</span></div></div>
+                    <div class="absolute top-[44%] left-[60%] -translate-x-1/2 -translate-y-1/2"><div class="w-5 h-5 rounded-full bg-senja-400/30 border border-senja-400/50 flex items-center justify-center"><div class="w-2 h-2 rounded-full bg-senja-400"></div></div><div class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap"><span class="text-senja-400 text-xs font-medium">batas</span></div></div>
+                    <div class="absolute top-[44%] left-[75%] -translate-y-1/2 flex items-center"><div class="w-4 h-4 border border-senja-400/20 rounded-full pulse-ring"></div><span class="ml-8 text-senja-400/60 text-xs italic font-display">→ musik</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-2xl mx-auto text-center">
+            <p class="font-elegant text-xl md:text-2xl text-wood-300 italic leading-relaxed">"Nama <span class="text-senja-400 font-medium">freet</span> diambil dari <span class="text-wood-100">fret</span> pada gitar — tempat jari menekan senar untuk menciptakan nada."</p>
+            <div class="w-16 h-px bg-senja-400/30 mx-auto my-8"></div>
+            <p class="text-wood-400 text-base md:text-lg leading-relaxed">Sebuah simbol bahwa setiap batas, luka, dan tekanan bisa berubah menjadi musik. Bahwa rasa sakit bukan akhir, melainkan nada yang belum dimainkan.</p>
+        </div>
+    </div></div>
+</section>
+
+<!-- MUSIC -->
+<section id="music" class="relative py-24 md:py-32">
+    <div class="max-w-7xl mx-auto px-6 md:px-12"><div class="fade-section">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+            <div>
+                <div class="flex items-center gap-3 mb-4"><div class="w-8 h-px bg-senja-400/40"></div><span class="text-senja-400 text-xs font-medium tracking-[.2em] uppercase">Musik</span></div>
+                <h2 class="font-display text-3xl md:text-5xl font-semibold text-wood-50">Dengarkan<br><span class="italic text-senja-400">ceritanya</span></h2>
+            </div>
+            <a href="https://www.youtube.com/@freetindo" target="_blank" class="flex items-center gap-2 text-wood-400 hover:text-senja-400 transition-colors text-sm group">Semua video di YouTube <i data-lucide="external-link" class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i></a>
+        </div>
+
+        <!-- Featured: Tanpamu (main sound) -->
+        <div class="mb-8 rounded-2xl overflow-hidden border border-senja-400/20 bg-wood-900/30">
+            <div class="flex items-center gap-2 px-5 py-3 bg-senja-400/5 border-b border-senja-400/10">
+                <div class="flex items-center gap-1"><div class="eq-bar w-[3px] rounded-full bg-senja-400" style="--eq:8px;animation-delay:0s"></div><div class="eq-bar w-[3px] rounded-full bg-senja-400" style="--eq:14px;animation-delay:.15s"></div><div class="eq-bar w-[3px] rounded-full bg-senja-400" style="--eq:6px;animation-delay:.3s"></div><div class="eq-bar w-[3px] rounded-full bg-senja-400" style="--eq:11px;animation-delay:.1s"></div></div>
+                <span class="text-senja-400 text-xs font-medium tracking-wide ml-2">NOW PLAYING</span>
+                <span class="text-wood-300 text-sm font-display ml-2">Tanpamu</span>
+            </div>
+            <div style="aspect-ratio:16/9;">
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/VAFh7hvBDS4?rel=0" title="Freet - Tanpamu" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <!-- 3 Video Lainnya -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Kembalilah -->
+            <div class="rounded-xl overflow-hidden border border-wood-800/40 bg-wood-900/30">
+                <div style="aspect-ratio:16/9;">
+                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/yFKqFijETFo?rel=0" title="Freet - Kembalilah" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                <div class="px-4 py-3 flex items-center gap-2 border-t border-wood-800/30">
+                    <img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="" class="w-5 h-5 rounded-full flex-shrink-0">
+                    <span class="font-display text-wood-200 text-sm font-medium">Kembalilah</span>
+                </div>
+            </div>
+
+            <!-- Bayangmu -->
+            <div class="rounded-xl overflow-hidden border border-wood-800/40 bg-wood-900/30">
+                <div style="aspect-ratio:16/9;">
+                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/oqx4f67t5Mc?rel=0" title="Freet - Bayangmu" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                <div class="px-4 py-3 flex items-center gap-2 border-t border-wood-800/30">
+                    <img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="" class="w-5 h-5 rounded-full flex-shrink-0">
+                    <span class="font-display text-wood-200 text-sm font-medium">Bayangmu</span>
+                </div>
+            </div>
+
+            <!-- Pergilah -->
+            <div class="rounded-xl overflow-hidden border border-wood-800/40 bg-wood-900/30">
+                <div style="aspect-ratio:16/9;">
+                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/LvY8kgvorCI?rel=0" title="Freet - Pergilah" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                <div class="px-4 py-3 flex items-center gap-2 border-t border-wood-800/30">
+                    <img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="" class="w-5 h-5 rounded-full flex-shrink-0">
+                    <span class="font-display text-wood-200 text-sm font-medium">Pergilah</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="https://www.youtube.com/@freetindo" target="_blank" class="inline-flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-red-600/20 group">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                Subscribe freet di YouTube <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+    </div></div>
+</section>
+
+<!-- MOOD -->
+<section id="mood" class="relative py-24 md:py-32 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-senja-950/10 to-transparent pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto px-6 md:px-12 relative z-10"><div class="fade-section">
+        <div class="text-center mb-16">
+            <div class="flex items-center justify-center gap-3 mb-6"><div class="w-8 h-px bg-senja-400/40"></div><span class="text-senja-400 text-xs font-medium tracking-[.2em] uppercase">Suasana</span><div class="w-8 h-px bg-senja-400/40"></div></div>
+            <h2 class="font-display text-3xl md:text-5xl font-semibold text-wood-50 mb-4">Masuk ke <span class="italic text-senja-400">ruangnya</span></h2>
+            <p class="text-wood-500 max-w-md mx-auto">Setiap lagu adalah ruang. Pilih suasana yang ingin kamu rasakan.</p>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3 mb-20">
+            <span class="mood-tag px-5 py-2.5 border border-wood-700/50 rounded-full text-wood-300 text-sm cursor-default">#musikIndieIndonesia</span>
+            <span class="mood-tag px-5 py-2.5 border border-senja-400/30 bg-senja-400/10 rounded-full text-senja-400 text-sm cursor-default">#laguGalau</span>
+            <span class="mood-tag px-5 py-2.5 border border-wood-700/50 rounded-full text-wood-300 text-sm cursor-default">#musikSenja</span>
+            <span class="mood-tag px-5 py-2.5 border border-wood-700/50 rounded-full text-wood-300 text-sm cursor-default">#indieFolk</span>
+            <span class="mood-tag px-5 py-2.5 border border-wood-700/50 rounded-full text-wood-300 text-sm cursor-default">#acousticVibes</span>
+            <span class="mood-tag px-5 py-2.5 border border-senja-400/30 bg-senja-400/10 rounded-full text-senja-400 text-sm cursor-default">#musicShorts</span>
+            <span class="mood-tag px-5 py-2.5 border border-wood-700/50 rounded-full text-wood-300 text-sm cursor-default">#folkPop</span>
+            <span class="mood-tag px-5 py-2.5 border border-wood-700/50 rounded-full text-wood-300 text-sm cursor-default">#nostalgia</span>
+            <span class="mood-tag px-5 py-2.5 border border-wood-700/50 rounded-full text-wood-300 text-sm cursor-default">#malamYangPanjang</span>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="group relative bg-wood-900/30 border border-wood-800/40 rounded-2xl p-8 hover:border-wood-700/60 transition-all duration-500 overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-senja-400/5 rounded-full blur-[60px] group-hover:bg-senja-400/10 transition-colors duration-500"></div>
+                <div class="relative z-10"><div class="w-12 h-12 rounded-xl bg-wood-800/50 border border-wood-700/50 flex items-center justify-center mb-6 group-hover:border-senja-400/30 transition-colors"><i data-lucide="cloud-rain" class="w-5 h-5 text-wood-400 group-hover:text-senja-400 transition-colors"></i></div><h3 class="font-display text-xl text-wood-100 font-medium mb-3">Kehilangan</h3><p class="text-wood-500 text-sm leading-relaxed">Untuk momen ketika seseorang pergi dan meninggalkan ruang yang tak bisa diisi oleh siapa pun.</p></div>
+            </div>
+            <div class="group relative bg-wood-900/30 border border-senja-400/20 rounded-2xl p-8 hover:border-senja-400/40 transition-all duration-500 overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-senja-400/10 rounded-full blur-[60px] group-hover:bg-senja-400/15 transition-colors duration-500"></div>
+                <div class="relative z-10"><div class="w-12 h-12 rounded-xl bg-senja-400/10 border border-senja-400/20 flex items-center justify-center mb-6 group-hover:border-senja-400/40 transition-colors"><i data-lucide="sunset" class="w-5 h-5 text-senja-400"></i></div><h3 class="font-display text-xl text-senja-400 font-medium mb-3">Nostalgia</h3><p class="text-wood-500 text-sm leading-relaxed">Untuk kenangan yang datang tanpa diundang, membawa senja yang sama dengan yang dulu kita lewati bersama.</p></div>
+            </div>
+            <div class="group relative bg-wood-900/30 border border-wood-800/40 rounded-2xl p-8 hover:border-wood-700/60 transition-all duration-500 overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-senja-400/5 rounded-full blur-[60px] group-hover:bg-senja-400/10 transition-colors duration-500"></div>
+                <div class="relative z-10"><div class="w-12 h-12 rounded-xl bg-wood-800/50 border border-wood-700/50 flex items-center justify-center mb-6 group-hover:border-senja-400/30 transition-colors"><i data-lucide="flame" class="w-5 h-5 text-wood-400 group-hover:text-senja-400 transition-colors"></i></div><h3 class="font-display text-xl text-wood-100 font-medium mb-3">Harapan Kecil</h3><p class="text-wood-500 text-sm leading-relaxed">Untuk cahaya kecil yang tetap bertahan diam-diam, meski dunia terasa terlalu sunyi.</p></div>
+            </div>
+        </div>
+        <div class="mt-20"><div class="max-w-xl mx-auto text-center">
+            <i data-lucide="quote" class="w-8 h-8 text-senja-400/30 mx-auto mb-6"></i>
+            <div class="space-y-4"><p class="lyric-line font-elegant text-lg md:text-xl text-wood-300 italic cursor-default">"Di antara senar yang putus dan jari yang lelah,"</p><p class="lyric-line font-elegant text-lg md:text-xl text-wood-300 italic cursor-default">"ada nada yang tetap mau lahir,"</p><p class="lyric-line font-elegant text-lg md:text-xl text-wood-300 italic cursor-default">"meski dari luka yang paling dalam."</p></div>
+            <div class="mt-6 text-wood-600 text-sm">— freet</div>
+        </div></div>
+    </div></div>
+</section>
+
+<!-- CONNECT -->
+<section id="connect" class="relative py-24 md:py-32">
+    <div class="max-w-7xl mx-auto px-6 md:px-12"><div class="fade-section">
+        <div class="relative bg-gradient-to-br from-wood-900/80 via-wood-900/60 to-senja-950/30 border border-wood-800/40 rounded-3xl p-10 md:p-16 text-center overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-senja-400/[.04] rounded-full blur-[100px] pointer-events-none"></div>
+            <div class="relative z-10">
+                <div class="flex items-end justify-center gap-[4px] h-8 mb-8" id="ctaWave"></div>
+                <h2 class="font-display text-3xl md:text-5xl font-semibold text-wood-50 mb-4">Masuk ke <span class="italic text-senja-400">ruang sunyi</span>-nya</h2>
+                <p class="text-wood-400 max-w-lg mx-auto mb-10 leading-relaxed">Ikuti perjalanan freet di YouTube. Setiap video adalah jendela ke ruang yang tenang — tempat musik bicara saat kata-kata tak mampu.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="https://www.youtube.com/@freetindo" target="_blank" class="group flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all hover:shadow-lg hover:shadow-red-600/20">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        Subscribe di YouTube <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                    <button onclick="copyLink()" class="flex items-center gap-3 px-8 py-4 border border-wood-700 text-wood-300 rounded-xl font-medium hover:border-wood-500 hover:text-wood-100 transition-all"><i data-lucide="link" class="w-5 h-5"></i> Bagikan freet</button>
+                </div>
+                <div class="mt-10 pt-8 border-t border-wood-800/40 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-wood-500">
+                    <a href="https://www.youtube.com/@freetindo" target="_blank" class="flex items-center gap-2 hover:text-senja-400 transition-colors"><i data-lucide="at-sign" class="w-4 h-4"></i> @freetindo</a>
+                    <span class="hidden sm:inline text-wood-700">•</span><span class="flex items-center gap-2"><i data-lucide="music" class="w-4 h-4"></i> Alternative Folk Pop</span>
+                    <span class="hidden sm:inline text-wood-700">•</span><span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> Indonesia</span>
+                </div>
+            </div>
+        </div>
+    </div></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="relative py-16 border-t border-wood-800/30">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="grid md:grid-cols-3 gap-12 items-start">
+            <div><div class="flex items-center gap-3 mb-4"><img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="" class="w-8 h-8 rounded-full"><span class="font-display text-lg font-medium text-wood-100">freet</span></div><p class="text-wood-600 text-sm leading-relaxed max-w-xs">Ruang sunyi yang diterjemahkan menjadi suara. Dari fret menjadi musik, dari luka menjadi nada.</p></div>
+            <div><h4 class="text-wood-400 text-xs tracking-[.15em] uppercase font-medium mb-4">Navigasi</h4><div class="space-y-3"><a href="#about" class="block text-wood-500 hover:text-senja-400 text-sm transition-colors">Tentang</a><a href="#meaning" class="block text-wood-500 hover:text-senja-400 text-sm transition-colors">Makna Nama</a><a href="#music" class="block text-wood-500 hover:text-senja-400 text-sm transition-colors">Musik</a><a href="#mood" class="block text-wood-500 hover:text-senja-400 text-sm transition-colors">Suasana</a></div></div>
+            <div><h4 class="text-wood-400 text-xs tracking-[.15em] uppercase font-medium mb-4">Ikuti</h4><a href="https://www.youtube.com/@freetindo" target="_blank" class="flex items-center gap-3 text-wood-500 hover:text-senja-400 text-sm transition-colors"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YouTube @freetindo</a></div>
+        </div>
+        <div class="mt-12 pt-8 border-t border-wood-800/20 flex flex-col md:flex-row items-center justify-between gap-4"><p class="text-wood-700 text-xs">© 2025 freet. Setiap batas bisa berubah menjadi musik.</p><p class="text-wood-800 text-xs">Dibuat dengan 🎸 dan keheningan</p></div>
+    </div>
+</footer>
+
+<!-- PLAYER BAR -->
+<div id="playerBar" class="player-bar fixed bottom-0 left-0 right-0 z-40 px-6 py-3 hidden">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0 cursor-pointer" onclick="document.getElementById('music').scrollIntoView({behavior:'smooth'})">
+            <img src="https://yt3.googleusercontent.com/z0kQleYiPjKFJCVP-UkXnB8TJnJB2xxHlXZL5MQv_3wVQoROBx0eOAQxfJCK88pqXWel4WsT=s160-c-k-c0x00ffffff-no-rj" alt="" class="w-10 h-10 rounded-lg object-cover flex-shrink-0">
+            <div class="min-w-0"><p class="text-wood-100 text-sm font-medium truncate">Tanpamu</p><p class="text-wood-500 text-xs truncate">freet</p></div>
+        </div>
+        <div class="flex items-center gap-1"><div class="eq-bar w-[3px] rounded-full bg-senja-400" style="--eq:8px;animation-delay:0s"></div><div class="eq-bar w-[3px] rounded-full bg-senja-400" style="--eq:14px;animation-delay:.15s"></div><div class="eq-bar w-[3px] rounded-full bg-senja-400" style="--eq:6px;animation-delay:.3s"></div><div class="eq-bar w-[3px] rounded-full bg-senja-400" style="--eq:11px;animation-delay:.1s"></div></div>
+        <button onclick="closePlayer()" class="w-8 h-8 flex items-center justify-center text-wood-500 hover:text-wood-200 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-5 py-3 bg-wood-800 border border-wood-700 rounded-xl text-wood-200 text-sm flex items-center gap-2 shadow-2xl"><i data-lucide="check-circle" class="w-4 h-4 text-senja-400"></i><span id="toastMsg"></span></div>
+
+<script>
+lucide.createIcons();
+
+// NAV
+window.addEventListener('scroll',()=>{const n=document.getElementById('navbar');if(window.scrollY>80){n.style.background='rgba(12,10,9,.85)';n.style.backdropFilter='blur(20px)';n.style.borderBottom='1px solid rgba(201,149,107,.08)'}else{n.style.background='transparent';n.style.backdropFilter='none';n.style.borderBottom='1px solid transparent'}});
+
+// MOBILE MENU
+let mOpen=false;document.getElementById('menuToggle').addEventListener('click',()=>{mOpen=!mOpen;document.getElementById('mobileMenu').classList.toggle('open',mOpen);document.getElementById('menuIcon').setAttribute('data-lucide',mOpen?'x':'menu');lucide.createIcons();document.body.style.overflow=mOpen?'hidden':''});
+document.querySelectorAll('.mob-link').forEach(l=>l.addEventListener('click',()=>{mOpen=false;document.getElementById('mobileMenu').classList.remove('open');document.getElementById('menuIcon').setAttribute('data-lucide','menu');lucide.createIcons();document.body.style.overflow=''}));
+
+// GUITAR STRINGS
+document.querySelectorAll('.guitar-string').forEach(s=>s.addEventListener('click',function(){this.classList.add('vibrating');setTimeout(()=>this.classList.remove('vibrating'),1200);showPlayer()}));
+
+// PARTICLES
+!function(){const c=document.getElementById('particles'),n=innerWidth<768?15:30;for(let i=0;i<n;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*3+1;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:-10px;background:rgba(241,147,72,${Math.random()*.4+.1});box-shadow:0 0 ${s*2}px rgba(241,147,72,${Math.random()*.2});animation-delay:${Math.random()*15}s;animation-duration:${Math.random()*10+15}s`;c.appendChild(p)}}();
+
+// WAVEFORMS
+function mkW(id,cnt,mx){const el=document.getElementById(id);if(!el)return;for(let i=0;i<cnt;i++){const b=document.createElement('span');b.className='wave-bar';b.style.setProperty('--h',(Math.random()*mx+4)+'px');b.style.animationDuration=(Math.random()*.5+.3)+'s';b.style.animationDelay=(Math.random()*.5)+'s';el.appendChild(b)}}
+mkW('miniWave',12,14);mkW('ctaWave',20,20);
+
+// SCROLL ANIM
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:.15,rootMargin:'0px 0px -50px 0px'});document.querySelectorAll('.fade-section,.fade-left,.fade-right').forEach(e=>obs.observe(e));
+
+// PLAYER BAR
+let pShown=false;function showPlayer(){if(!pShown){const b=document.getElementById('playerBar');b.classList.remove('hidden');b.style.transform='translateY(100%)';requestAnimationFrame(()=>{b.style.transition='transform .5s cubic-bezier(.4,0,.2,1)';b.style.transform='translateY(0)'});pShown=true}}
+function closePlayer(){const b=document.getElementById('playerBar');b.style.transform='translateY(100%)';setTimeout(()=>{b.classList.add('hidden');pShown=false},500)}
+let sc=0;window.addEventListener('scroll',()=>{if(++sc>50&&!pShown)showPlayer()});
+
+// COPY / TOAST
+function copyLink(){navigator.clipboard.writeText('https://www.youtube.com/@freetindo').then(()=>showToast('Link YouTube freet berhasil disalin!')).catch(()=>showToast('Gagal menyalin'))}
+function showToast(m){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})}));
+
+setTimeout(()=>lucide.createIcons(),300);
+</script>
+</body>
+</html>
